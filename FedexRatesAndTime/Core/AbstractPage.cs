@@ -1,4 +1,5 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,7 +13,10 @@ using System.Threading.Tasks;
 namespace FedexRatesAndTime.Core {
     public abstract class AbstractPage : IDisposable {
         bool disposed = false;
+
+        protected const int PageLoadTimeoutInSeconds = 10;
         protected IWebDriver _driver;
+
         protected AbstractPage(string pageUrl) {
             var browser = new Firefox();
             _driver = browser.Start();
@@ -136,6 +140,34 @@ namespace FedexRatesAndTime.Core {
             }
         }
 
+        protected void ScrollTo(int xPosition = 0, int yPosition = 0) {
+            var js = String.Format("window.scrollTo({0}, {1})", xPosition, yPosition);
+            ((IJavaScriptExecutor)_driver).ExecuteScript(js);
+        }
+
+        protected void ScrollTo(IWebDriver driver, IWebElement element) {
+            if (element.Location.Y > 50) {
+                ScrollTo(0, element.Location.Y - 200); // Make sure element is in the view but below the top navigation pane
+            }
+        }
+
+        protected void WaitForAjax() {
+            /* while (true) // Handle timeout somewhere
+             {
+                 var ajaxIsComplete = (bool)(_driver as IJavaScriptExecutor).ExecuteScript("return jQuery.active == 0");
+                 if (ajaxIsComplete)
+                     break;
+                 Thread.Sleep(TimeSpan.FromMilliseconds(100));
+             }*/
+            /// I am looking for a solid way to handle traditional Ajax requests.
+            Thread.Sleep(TimeSpan.FromSeconds(PageLoadTimeoutInSeconds));
+        }
+
+        protected void waitForPageLoad() {
+            IWait<IWebDriver> wait = new OpenQA.Selenium.Support.UI.WebDriverWait(_driver, TimeSpan.FromSeconds(PageLoadTimeoutInSeconds));
+            wait.Until(driver1 => ((IJavaScriptExecutor)driver1).ExecuteScript("return document.readyState").Equals("complete"));
+            Thread.Sleep(TimeSpan.FromSeconds(0.5));
+        }
 
         public void Dispose() {
             if (disposed)
