@@ -166,7 +166,6 @@ namespace FedexRatesAndTime.Core {
         protected void waitForPageLoad() {
             IWait<IWebDriver> wait = new OpenQA.Selenium.Support.UI.WebDriverWait(_driver, TimeSpan.FromSeconds(PageLoadTimeoutInSeconds));
             wait.Until(driver1 => ((IJavaScriptExecutor)driver1).ExecuteScript("return document.readyState").Equals("complete"));
-            Thread.Sleep(TimeSpan.FromSeconds(0.5));
         }
 
         public void Dispose() {
