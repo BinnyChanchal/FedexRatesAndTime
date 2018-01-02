@@ -152,15 +152,8 @@ namespace FedexRatesAndTime.Core {
         }
 
         protected void WaitForAjax() {
-            /* while (true) // Handle timeout somewhere
-             {
-                 var ajaxIsComplete = (bool)(_driver as IJavaScriptExecutor).ExecuteScript("return jQuery.active == 0");
-                 if (ajaxIsComplete)
-                     break;
-                 Thread.Sleep(TimeSpan.FromMilliseconds(100));
-             }*/
-            /// I am looking for a solid way to handle traditional Ajax requests.
-            Thread.Sleep(TimeSpan.FromSeconds(PageLoadTimeoutInSeconds));
+            IWait<IWebDriver> wait = new OpenQA.Selenium.Support.UI.WebDriverWait(_driver, TimeSpan.FromSeconds(PageLoadTimeoutInSeconds));
+            wait.Until(driver1 => ((IJavaScriptExecutor)driver1).ExecuteScript("return document.readyState").Equals("complete"));
         }
 
         protected void waitForPageLoad() {
